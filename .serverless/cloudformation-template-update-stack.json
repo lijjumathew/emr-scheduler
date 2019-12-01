@@ -1,0 +1,220 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "StartEmrClusterLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/emr-scheduler-start-emr-dev"
+      }
+    },
+    "StopEmrClusterLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/emr-scheduler-stop-emr-dev"
+      }
+    },
+    "StartEmrClusterLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "lm-deployment-bucket",
+          "S3Key": "serverless/emr-scheduler/dev/1575157892100-2019-11-30T23:51:32.100Z/emr-scheduler-start-emr-cluster.zip"
+        },
+        "FunctionName": "emr-scheduler-start-emr-dev",
+        "Handler": "lambda_function.lambda_handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "manageEmrCluster",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.6",
+        "Timeout": 60,
+        "Environment": {
+          "Variables": {
+            "CLUSTER_NAME": "HELLO-EMR-CLUSTER",
+            "LOG_BUCKET": "lm-emr-log-bucket",
+            "SUBNET_ID": "s124ssedd"
+          }
+        }
+      },
+      "DependsOn": [
+        "StartEmrClusterLogGroup",
+        "manageEmrCluster"
+      ]
+    },
+    "StartEmrClusterLambdaVersionhnG3Mu2F9xSuKwAbh3IojbznorIPQG8HOefbxvUbg": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartEmrClusterLambdaFunction"
+        },
+        "CodeSha256": "QCoeh8wQzfShal1N4blTWR6eNEt8ySVDjPa0iXhNXtE="
+      }
+    },
+    "StopEmrClusterLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "lm-deployment-bucket",
+          "S3Key": "serverless/emr-scheduler/dev/1575157892100-2019-11-30T23:51:32.100Z/emr-scheduler-stop-emr-cluster.zip"
+        },
+        "FunctionName": "emr-scheduler-stop-emr-dev",
+        "Handler": "lambda_function.lambda_handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "manageEmrCluster",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.6",
+        "Timeout": 60,
+        "Environment": {
+          "Variables": {
+            "CLUSTER_NAME": "HELLO-EMR-CLUSTER"
+          }
+        }
+      },
+      "DependsOn": [
+        "StopEmrClusterLogGroup",
+        "manageEmrCluster"
+      ]
+    },
+    "StopEmrClusterLambdaVersionHaAOMePNRBfBkBE9eiSSUKl8Z6kpSZk6WfU2Ap62EM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StopEmrClusterLambdaFunction"
+        },
+        "CodeSha256": "fdVsnE0OkXQk9iRtt1yplLbvnqp4G7ZXHIQcX72NE0Y="
+      }
+    },
+    "StartEmrClusterEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "cron(0 15 * * ? *)",
+        "State": "ENABLED",
+        "Name": "emr-scheduler-start-emr-dev",
+        "Description": "Invokes the start emr lambda on a schedule",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "StartEmrClusterLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "startEmrClusterSchedule"
+          }
+        ]
+      }
+    },
+    "StartEmrClusterLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartEmrClusterLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "StartEmrClusterEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "StopEmrClusterEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "cron(0 23 * * ? *)",
+        "State": "ENABLED",
+        "Name": "emr-scheduler-stop-emr-dev",
+        "Description": "Invokes the stop emr lambda on a schedule",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "StopEmrClusterLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "stopEmrClusterSchedule"
+          }
+        ]
+      }
+    },
+    "StopEmrClusterLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StopEmrClusterLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "StopEmrClusterEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "manageEmrCluster": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "emr-scheduler-schedules-dev",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role",
+          "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole",
+          "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforAutoScalingRole",
+          "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
+          "arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess"
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": "lm-deployment-bucket"
+    },
+    "StartEmrClusterLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartEmrClusterLambdaVersionhnG3Mu2F9xSuKwAbh3IojbznorIPQG8HOefbxvUbg"
+      }
+    },
+    "StopEmrClusterLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StopEmrClusterLambdaVersionHaAOMePNRBfBkBE9eiSSUKl8Z6kpSZk6WfU2Ap62EM"
+      }
+    }
+  }
+}

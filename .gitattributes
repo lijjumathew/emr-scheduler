@@ -1,0 +1,9 @@
+# set the default line ending behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# linux shell scripts should always have lf line endings
+*.sh eol=lf
+
+# denote all binary files here
+*.jpg binary
+*.png binary

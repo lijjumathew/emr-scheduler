@@ -1,0 +1,72 @@
+service: emr-scheduler
+custom:
+  env: ${env:ENV}
+  clusterName: ${env:CLUSTER_NAME} 
+  subnetId: ${env:SUBNET_ID}
+  logBucket: ${env:LOG_BUCKET}
+  
+provider:
+  name: aws
+  runtime: python3.6
+  region: us-east-1
+  deploymentBucket: ${env:DEPLOYMENT_BUCKET}
+  stackTags:
+    bill-code: 'xxxx'
+    bill-stack : 'emr-scheduler'
+    
+package:
+  individually: true    
+
+functions:
+  startEmrCluster: 
+    role: manageEmrCluster
+    environment:
+      CLUSTER_NAME: ${self:custom.clusterName}
+      LOG_BUCKET: ${self:custom.logBucket}
+      SUBNET_ID: ${self:custom.subnetId}
+    timeout: 60
+    name: ${self:service}-start-emr-${self:custom.env}
+    handler: lambda_function.lambda_handler
+    events:
+      - schedule:
+          name: ${self:service}-start-emr-${self:custom.env}
+          description: 'Invokes the start emr lambda on a schedule'
+          rate: cron(0 15 * * ? *)
+    package:
+      artifact: target/${self:service}-start-emr-cluster.zip
+  
+  stopEmrCluster: 
+    role: manageEmrCluster
+    environment:
+      CLUSTER_NAME: ${self:custom.clusterName}
+    timeout: 60
+    name: ${self:service}-stop-emr-${self:custom.env}
+    handler: lambda_function.lambda_handler
+    events:
+      - schedule:
+          name: ${self:service}-stop-emr-${self:custom.env}
+          description: 'Invokes the stop emr lambda on a schedule'
+          rate: cron(0 23 * * ? *)
+    package:
+      artifact: target/${self:service}-stop-emr-cluster.zip
+
+resources:
+  Resources:
+    manageEmrCluster:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-schedules-${self:custom.env}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role 
+          - arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole
+          - arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforAutoScalingRole
+          - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+          - arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess
