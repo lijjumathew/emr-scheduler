@@ -70,3 +70,20 @@ resources:
           - arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforAutoScalingRole
           - arn:aws:iam::aws:policy/AmazonEC2FullAccess
           - arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess
+
+    LogPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: ${self:service}-log-policy-${self:provider.stage}
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - logs:DescribeLogStreams
+              Resource: '*'
+        Roles:
+          - Ref: manageEmrCluster

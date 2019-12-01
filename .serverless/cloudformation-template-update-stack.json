@@ -19,7 +19,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "lm-deployment-bucket",
-          "S3Key": "serverless/emr-scheduler/dev/1575157892100-2019-11-30T23:51:32.100Z/emr-scheduler-start-emr-cluster.zip"
+          "S3Key": "serverless/emr-scheduler/dev/1575217889401-2019-12-01T16:31:29.401Z/emr-scheduler-start-emr-cluster.zip"
         },
         "FunctionName": "emr-scheduler-start-emr-dev",
         "Handler": "lambda_function.lambda_handler",
@@ -45,14 +45,14 @@
         "manageEmrCluster"
       ]
     },
-    "StartEmrClusterLambdaVersionhnG3Mu2F9xSuKwAbh3IojbznorIPQG8HOefbxvUbg": {
+    "StartEmrClusterLambdaVersionN3qmx2o3ofMC9lrVgXv9LigKcsymwpbHd3IFGqg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "StartEmrClusterLambdaFunction"
         },
-        "CodeSha256": "QCoeh8wQzfShal1N4blTWR6eNEt8ySVDjPa0iXhNXtE="
+        "CodeSha256": "+vit9g6YXPkYrBzUCrNRIC/FHHAmd4D8DcK/ocrVhKY="
       }
     },
     "StopEmrClusterLambdaFunction": {
@@ -60,7 +60,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "lm-deployment-bucket",
-          "S3Key": "serverless/emr-scheduler/dev/1575157892100-2019-11-30T23:51:32.100Z/emr-scheduler-stop-emr-cluster.zip"
+          "S3Key": "serverless/emr-scheduler/dev/1575217889401-2019-12-01T16:31:29.401Z/emr-scheduler-stop-emr-cluster.zip"
         },
         "FunctionName": "emr-scheduler-stop-emr-dev",
         "Handler": "lambda_function.lambda_handler",
@@ -84,14 +84,14 @@
         "manageEmrCluster"
       ]
     },
-    "StopEmrClusterLambdaVersionHaAOMePNRBfBkBE9eiSSUKl8Z6kpSZk6WfU2Ap62EM": {
+    "StopEmrClusterLambdaVersion2POpLH59xCDRvWv3WQFKm7HM45k94dLanx8xQq5ed8": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "StopEmrClusterLambdaFunction"
         },
-        "CodeSha256": "fdVsnE0OkXQk9iRtt1yplLbvnqp4G7ZXHIQcX72NE0Y="
+        "CodeSha256": "+xRiTuxmHXMSvWs2jeHdwu91EPcKcx0iJVW83SoK0Lc="
       }
     },
     "StartEmrClusterEventsRuleSchedule1": {
@@ -198,6 +198,32 @@
           "arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess"
         ]
       }
+    },
+    "LogPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "emr-scheduler-log-policy-dev",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "manageEmrCluster"
+          }
+        ]
+      }
     }
   },
   "Outputs": {
@@ -207,13 +233,13 @@
     "StartEmrClusterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "StartEmrClusterLambdaVersionhnG3Mu2F9xSuKwAbh3IojbznorIPQG8HOefbxvUbg"
+        "Ref": "StartEmrClusterLambdaVersionN3qmx2o3ofMC9lrVgXv9LigKcsymwpbHd3IFGqg"
       }
     },
     "StopEmrClusterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "StopEmrClusterLambdaVersionHaAOMePNRBfBkBE9eiSSUKl8Z6kpSZk6WfU2Ap62EM"
+        "Ref": "StopEmrClusterLambdaVersion2POpLH59xCDRvWv3WQFKm7HM45k94dLanx8xQq5ed8"
       }
     }
   }

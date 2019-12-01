@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 EMR_CLIENT = boto3.client('emr')
-CLUSTER_NAME = os.env('CLUSTER_NAME')
+CLUSTER_NAME = os.getenv('CLUSTER_NAME')
 
 
 def lambda_handler(event, context):

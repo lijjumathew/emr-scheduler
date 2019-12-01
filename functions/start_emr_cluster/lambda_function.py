@@ -3,9 +3,9 @@ import os
 from datetime import datetime
 
 EMR_CLIENT = boto3.client('emr')
-CLUSTER_NAME = os.env('CLUSTER_NAME')
-LOG_BUCKET = os.env('LOG_BUCKET')
-SUBNET_ID = os.env('SUBNET_ID')
+CLUSTER_NAME = os.getenv('CLUSTER_NAME')
+LOG_BUCKET = os.getenv('LOG_BUCKET')
+SUBNET_ID = os.getenv('SUBNET_ID')
 
 
 def handler(event, context):
