@@ -15,15 +15,12 @@ Install latest version of
 
 Also have the below variables set 
 
-export DEV=<Environment name like dev,qa,test etc>   
-
-export CLUSTER_NAME=<Cluster name>   
-
+`export DEV=<Environment name like dev,qa,test etc>   
+export CLUSTER_NAME=<Name of the Cluster>   
 export LOG_BUCKET=<S3 Bucket name for logs, should be created before deploying>   
-
 export DEPLOYMENT_BUCKET=<S3 Bucket name for deployments, should be created before deploying>   
-
-export SUBNET_ID=<subnet id where EMR Cluster should run>   
+export SUBNET_ID=<Subnet id where EMR Cluster should run>   
+`
 
 ### Deployment
 1. Clone the repo
